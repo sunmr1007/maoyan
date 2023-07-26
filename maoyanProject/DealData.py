@@ -21,7 +21,7 @@ class DealData():
         cinema_need_df = pd.read_excel(f'{FilePath}/cinemas_need.xlsx')
         df = pd.merge(cinema_all_df, cinema_need_df, on="cinema_name", how='right')
         # TODO
-        data = cinema_all_df.to_json(orient="table")
+        data = df.to_json(orient="table")
         cinemas_list = json.loads(data)["data"]
         for cinema in cinemas_list:
             if not cinema["cinema_url"]:
