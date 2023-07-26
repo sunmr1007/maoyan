@@ -25,17 +25,6 @@ class Spider(scrapy.Spider):
 
         }
 
-        # 不确定能用多久
-        # self.cookies = {
-        #     # 不带上会302跳转
-        #     'uuid': '0D3967E0264C11EEB6A41DA4355E52AD0CF4EA203D9B4C4C87A92A91B8530B1B',
-        #     # 带账号信息
-        #     "token": "AgFrIGfnjMWSn06fBToS8lbrobT46--jEls-t0aOwbwty2_5d6yUapCo8SNtiwxHYp2_LPw0NV3l8QAAAACpGQAAA0P6gd32VWPE88YWaATUITKfqHBQepPDDQWNKCsKcYvQKUkEjcoYi13wEY9b5nBy",
-        #
-        #     # 'token': 'AgHzH_f29UaMi59If77Rs_LW9HgDMuXqQ1lyfVRGs22jX-88opLYj62tj5wa473A0QAv-W1MrD8VZQAAAACpGQAAh1wIYfG23pnnNGMpMRHJR3PiL4YYTgJS05xJTssvRCO0p0AIfa7aJJcsnhUwjqp7',
-        #
-        # }
-
         self.cookies = json.loads(cookies)
         self.cinemas_list = DealData().get_cinemas_info()
 
@@ -114,11 +103,10 @@ if __name__ == "__main__":
     # 辛
     cookies = {
         # 不带上会302跳转
-        'uuid': '53A74BA02AA411EEBE787F4E202C30183C00B5645C594930889421530C736F9D',
+        'uuid': '',
         # 带账号信息
-        "token": "AgEFJZt2EivC9L3IYC9TrtsgaiqnrILqn2lAHgJB0JQWwTmzawx8CKWLUCJ-yO8id6H3qLeX-tCfBgAAAACpGQAAwTfPXP1XEf49FAX89lmFs8aky7VEpO-Mm70NUiNq3q_mxpdC20G2QrEsAY01YbKI",
+        "token": "",
 
-        # 'token': 'AgHzH_f29UaMi59If77Rs_LW9HgDMuXqQ1lyfVRGs22jX-88opLYj62tj5wa473A0QAv-W1MrD8VZQAAAACpGQAAh1wIYfG23pnnNGMpMRHJR3PiL4YYTgJS05xJTssvRCO0p0AIfa7aJJcsnhUwjqp7',
 
     }
     execute(["scrapy", "crawl", "ALLIN", "-a", f"movie_date={movie_date}", "-a", f"cookies={json.dumps(cookies)}"])
