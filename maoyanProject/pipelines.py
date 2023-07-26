@@ -24,7 +24,7 @@ class ALLPipeline(object):
         self.count = 0
         # self.file = open(f"C:/Users/Administrator/Desktop/allin.csv", "wb")
         # self.file = open("/Users/laysuda/Desktop/allin/热烈0726.csv", "wb")
-        self.file = open(f"{FilePath}/allin.csv", "ab")
+        self.file = open(f"{FilePath}/allin.csv", "wb")
         self.exporter = CsvItemExporter(self.file, encoding='utf-8-sig',
                                         fields_to_export=["movie", "city_name", "cinema_date", "cinema_name",
                                                           'cinema_url', "cinema_address", "hall",
