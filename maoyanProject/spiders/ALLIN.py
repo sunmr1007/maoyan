@@ -13,12 +13,12 @@ from maoyanProject.items import ALLItem
 class Spider(scrapy.Spider):
     name = "ALLIN"
 
-    def __init__(self, movie_date, cookies, *args, **kwargs):
+    def __init__(self, movie_date, cookies, is_wanda, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.movie_date = movie_date  # 日期（要填）
-        # self.movieId = '1439161'  # 电影id（热烈）
-        self.movieId = '1413252'  # 电影id（热烈）
-        self.movie = '八角笼中'  # 电影名（热烈）
+        self.movieId = '1413252'  # 电影id（八角笼中）
+        # self.movieId = '1374349'  # 电影id（孤注一掷）
+        self.movie = '八角笼中'  # 电影名（孤注一掷）
         self.headers = {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1',
@@ -26,10 +26,10 @@ class Spider(scrapy.Spider):
         }
 
         self.cookies = json.loads(cookies)
-        self.cinemas_list = DealData().get_cinemas_info()
+        self.cinemas_list = DealData().get_cinemas_info(is_wanda)
 
     def start_requests(self):
-        for cinema in self.cinemas_list[1000:1166]:
+        for cinema in self.cinemas_list:
             if not cinema["cinema_url"]:
                 return
             url = f'{cinema["cinema_url"]}&movieId={self.movieId}'
@@ -39,7 +39,7 @@ class Spider(scrapy.Spider):
                 cookies=self.cookies,
                 meta={'cinema_item': cinema}
             )
-            # return
+            return
 
     def parse(self, response, **kwargs):
         cinema_item = response.meta["cinema_item"]
