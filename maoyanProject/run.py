@@ -6,18 +6,19 @@ sys.path.append(os.path.abspath('../'))
 from maoyanProject.DealData import DealData
 
 
-def run(movie_date, cookies, file_path):
+def run(movie_date, cookies, file_path, is_wanda):
     from scrapy.cmdline import execute
-    execute(["scrapy", "crawl", "ALLIN", "-a", f"movie_date={movie_date}", "-a", f"cookies={json.dumps(cookies)}"])
+    execute(["scrapy", "crawl", "ALLIN", "-a", f"movie_date={movie_date}", "-a", f"cookies={json.dumps(cookies)}", "-a",
+             f"is_wanda={is_wanda}"])
     # 对爬到的数据处理
     DealData().deal_data(fill_rate_dict, file_path)
 
 
 if __name__ == '__main__':
     # 电影日期
-    movie_date = "2023-07-27"
-    # 要爬取的影院信息列表
-    cinemas_list = DealData().get_cinemas_info()
+    movie_date = "2023-07-28"
+    # 要爬 台的万达(is_wanda=True)，散粉(is_wanda=False)
+    is_wanda = True
     # 辛
     cookies = {
         # 不带上会302跳转
@@ -32,4 +33,4 @@ if __name__ == '__main__':
     fill_rate_dict = {"非黄金场": 0.02, "黄金场": 0.05}
     file_path = "/Users/laysuda/Desktop/allin/test.xlsx"
 
-    run(movie_date, cookies, file_path)
+    run(movie_date, cookies, file_path, is_wanda)

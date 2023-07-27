@@ -12,19 +12,26 @@ FilePath = dirname(maoyanProject.files.__file__)
 
 class DealData():
 
-    def get_cinemas_info(self):
+    def get_cinemas_info(self, is_wanda=True):
         """
         获取要爬取的电影院信息
         :return:
         """
-        cinema_all_df = pd.read_excel(f'{FilePath}/cinemas_all.xlsx')
-        cinema_need_df = pd.read_excel(f'{FilePath}/cinemas_need.xlsx')
-        df = pd.merge(cinema_all_df, cinema_need_df, on="cinema_name", how='right')
-        # TODO
+        # cinema_all_df = pd.read_excel(f'{FilePath}/cinemas_all.xlsx')
+        # cinema_need_df = pd.read_excel(f'{FilePath}/cinemas_need.xlsx')
+        # cinema_other_df = pd.read_excel(f'{FilePath}/cinema_other.xlsx')
+        # cinema_df = pd.read_excel(f'{FilePath}/cinemas.xlsx')
+        if is_wanda:
+            # 台台
+            df = pd.read_excel(f'{FilePath}/cinema_tai.xlsx')
+        else:
+            # 其他
+            df = pd.read_excel(f'{FilePath}/cinema_other.xlsx')
+        # df.to_excel(f'{FilePath}/cinema_other.xlsx', index=False)
         data = df.to_json(orient="table")
         cinemas_list = json.loads(data)["data"]
         for cinema in cinemas_list:
-            if not cinema["cinema_url"]:
+            if not cinema.get("cinema_url"):
                 logger.warning(f'{cinema["cinema_name"]} 未匹配到该影院，请核查！')
                 return
         return cinemas_list
@@ -94,5 +101,6 @@ class DealData():
 
 
 if __name__ == '__main__':
-    DealData().deal_data(fill_rate_dict={"非黄金场":0.02, "黄金场":0.05}, file_path="/Users/laysuda/Desktop/allin/八角笼中0727（北上广部分深）.xlsx")
+    # DealData().deal_data(fill_rate_dict={"非黄金场":0.02, "黄金场":0.05}, file_path="/Users/laysuda/Desktop/allin/八角笼中0728.xlsx")
+    DealData().get_cinemas_info(is_wanda=True)
     # pass
