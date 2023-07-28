@@ -2,8 +2,8 @@ import json
 
 import scrapy
 
-from maoyanProject.DealData import DealData
 from maoyanProject.items import ALLItem
+from maoyanProject.utils.DealData import get_cinemas_info
 
 """
 爬取每个电影院每个场次信息
@@ -13,12 +13,12 @@ from maoyanProject.items import ALLItem
 class Spider(scrapy.Spider):
     name = "ALLIN"
 
-    def __init__(self, movie_date, cookies, is_wanda, *args, **kwargs):
+    def __init__(self, movie_date, cookies, is_who, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.movie_date = movie_date  # 日期（要填）
-        self.movieId = '1413252'  # 电影id（八角笼中）
-        # self.movieId = '1374349'  # 电影id（孤注一掷）
-        self.movie = '八角笼中'  # 电影名（孤注一掷）
+        # self.movieId = '1413252'  # 电影id（八角笼中）
+        self.movieId = '1374349'  # 电影id（孤注一掷）
+        self.movie = '孤注一掷'  # 电影名（孤注一掷）
         self.headers = {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1',
@@ -26,7 +26,7 @@ class Spider(scrapy.Spider):
         }
 
         self.cookies = json.loads(cookies)
-        self.cinemas_list = DealData().get_cinemas_info(is_wanda)
+        self.cinemas_list = get_cinemas_info(is_who)
 
     def start_requests(self):
         for cinema in self.cinemas_list:
@@ -39,7 +39,7 @@ class Spider(scrapy.Spider):
                 cookies=self.cookies,
                 meta={'cinema_item': cinema}
             )
-            return
+            # return
 
     def parse(self, response, **kwargs):
         cinema_item = response.meta["cinema_item"]
@@ -71,7 +71,7 @@ class Spider(scrapy.Spider):
                 callback=self.detail_parse,
                 meta={"item": item}
             )
-            # return
+            # continue
 
     def detail_parse(self, response):
         item = response.meta["item"]
@@ -98,8 +98,13 @@ if __name__ == "__main__":
     # execute(["scrapy", "crawl", Spider.name])
     # 电影日期
     movie_date = "2023-07-27"
+    # 要爬 台的万达(is_who=0)，兴吧(is_who=1)，散粉(is_who=2)
+    is_who = 0
+    # is_who = 1
+    # is_who = 2
     # 要爬取的影院信息列表
-    cinemas_list = DealData().get_cinemas_info()
+    cinemas_list = get_cinemas_info(is_who)
+
     # 辛
     cookies = {
         # 不带上会302跳转
@@ -107,6 +112,6 @@ if __name__ == "__main__":
         # 带账号信息
         "token": "",
 
-
     }
-    execute(["scrapy", "crawl", "ALLIN", "-a", f"movie_date={movie_date}", "-a", f"cookies={json.dumps(cookies)}"])
+    execute(["scrapy", "crawl", "ALLIN", "-a", f"movie_date={movie_date}", "-a", f"cookies={json.dumps(cookies)}", "-a",
+             f"is_who={is_who}"])

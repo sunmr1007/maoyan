@@ -27,4 +27,8 @@ class ALLItem(scrapy.Item):
     all_seats = scrapy.Field()
     selectable_seat = scrapy.Field()
     sold_seat = scrapy.Field()
+    is_weekday = scrapy.Field()
     occupancy_rate = scrapy.Field()
+    is_gold = scrapy.Field()
+    fill_rate = scrapy.Field()
+    fill_seats = scrapy.Field()
