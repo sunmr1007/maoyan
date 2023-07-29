@@ -13,9 +13,9 @@ from maoyanProject.utils.DealData import get_cinemas_info
 class Spider(scrapy.Spider):
     name = "ALLIN"
 
-    def __init__(self, movie_date, cookies, is_who, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.movie_date = movie_date  # 日期（要填）
+        self.movie_date_list = ['2023-08-11', '2023-08-12']  # 日期（要填）
         # self.movieId = '1413252'  # 电影id（八角笼中）
         self.movieId = '1374349'  # 电影id（孤注一掷）
         self.movie = '孤注一掷'  # 电影名（孤注一掷）
@@ -25,8 +25,17 @@ class Spider(scrapy.Spider):
 
         }
 
-        self.cookies = json.loads(cookies)
-        self.cinemas_list = get_cinemas_info(is_who)
+        self.cookies = {
+            # 不带上会302跳转
+            'uuid': '',
+            # 带账号信息
+            "token": "",
+        }
+        # 要爬 台的万达(owner=0)，兴吧(owner=1)，散粉(owner=2)
+        self.owner = "台"
+        # self.owner = "兴吧"
+        # self.owner = "散粉"
+        self.cinemas_list = get_cinemas_info(self.owner)
 
     def start_requests(self):
         for cinema in self.cinemas_list:
@@ -44,34 +53,36 @@ class Spider(scrapy.Spider):
     def parse(self, response, **kwargs):
         cinema_item = response.meta["cinema_item"]
         # print(response.text)
-        movie_data = self.movie_date.replace("-", "")
-        xpath_params = f'//*[contains(@class,"show-list")]//a[contains(@href,"movieId={self.movieId}")][contains(@href,"{movie_data}")]/../..'
-        rows = response.xpath(xpath_params)
-        for row in rows:
-            item = ALLItem()
-            item["movie"] = self.movie
-            item["cinema_date"] = self.movie_date
-            item["city_name"] = cinema_item["city_name"]
-            item["cinema_name"] = cinema_item["cinema_name"]
-            item["cinema_url"] = cinema_item["cinema_url"]
-            item["cinema_address"] = cinema_item["cinema_address"]
+        for date in self.movie_date_list:
+            movie_data = date.replace("-", "")
+            xpath_params = f'//*[contains(@class,"show-list")]//a[contains(@href,"movieId={self.movieId}")][contains(@href,"{movie_data}")]/../..'
+            rows = response.xpath(xpath_params)
+            for row in rows:
+                item = ALLItem()
+                item["owner"] = self.owner
+                item["movie"] = self.movie
+                item["cinema_date"] = date
+                item["city_name"] = cinema_item["city_name"]
+                item["cinema_name"] = cinema_item["cinema_name"]
+                item["cinema_url"] = cinema_item["cinema_url"]
+                item["cinema_address"] = cinema_item["cinema_address"]
 
-            item["begin_time"] = row.xpath('.//span[@class="begin-time"]/text()').get()
-            item["lang"] = row.xpath('.//span[@class="lang"]/text()').get()
-            item["hall"] = row.xpath('.//span[@class="hall"]/text()').get()
-            # item["sell-price"] = row.xpath('.//span[@class="sell-price"]/text()').get()
+                item["begin_time"] = row.xpath('.//span[@class="begin-time"]/text()').get()
+                item["lang"] = row.xpath('.//span[@class="lang"]/text()').get()
+                item["hall"] = row.xpath('.//span[@class="hall"]/text()').get()
+                # item["sell-price"] = row.xpath('.//span[@class="sell-price"]/text()').get()
 
-            href = row.xpath('./td[last()]/a/@href').get()
-            url = f"https://www.maoyan.com{href}"
-            item["url"] = url
-            yield scrapy.Request(
-                url=url,
-                headers=self.headers,
-                cookies=self.cookies,
-                callback=self.detail_parse,
-                meta={"item": item}
-            )
-            # continue
+                href = row.xpath('./td[last()]/a/@href').get()
+                url = f"https://www.maoyan.com{href}"
+                item["url"] = url
+                yield scrapy.Request(
+                    url=url,
+                    headers=self.headers,
+                    cookies=self.cookies,
+                    callback=self.detail_parse,
+                    meta={"item": item}
+                )
+                # continue
 
     def detail_parse(self, response):
         item = response.meta["item"]
@@ -95,23 +106,4 @@ class Spider(scrapy.Spider):
 if __name__ == "__main__":
     from scrapy.cmdline import execute
 
-    # execute(["scrapy", "crawl", Spider.name])
-    # 电影日期
-    movie_date = "2023-07-27"
-    # 要爬 台的万达(is_who=0)，兴吧(is_who=1)，散粉(is_who=2)
-    is_who = 0
-    # is_who = 1
-    # is_who = 2
-    # 要爬取的影院信息列表
-    cinemas_list = get_cinemas_info(is_who)
-
-    # 辛
-    cookies = {
-        # 不带上会302跳转
-        'uuid': '',
-        # 带账号信息
-        "token": "",
-
-    }
-    execute(["scrapy", "crawl", "ALLIN", "-a", f"movie_date={movie_date}", "-a", f"cookies={json.dumps(cookies)}", "-a",
-             f"is_who={is_who}"])
+    execute(["scrapy", "crawl", Spider.name])

@@ -14,6 +14,7 @@ class MaoyanprojectItem(scrapy.Item):
 
 class ALLItem(scrapy.Item):
     movie = scrapy.Field()
+    owner = scrapy.Field()
     cinema_date = scrapy.Field()
     city_name = scrapy.Field()
     cinema_name = scrapy.Field()

@@ -8,26 +8,29 @@ from loguru import logger
 import maoyanProject.files
 
 FilePath = dirname(maoyanProject.files.__file__)
+"""
+对表格的相关处理函数
+"""
 
 
-def get_cinemas_info(is_who=0):
+def get_cinemas_info(owner="台"):
     """
     获取要爬取的电影院信息
     :return:
     """
     # cinema_all_df = pd.read_excel(f'{FilePath}/cinemas_all.xlsx')
     # df = pd.merge(cinema_all_df, cinema_df, on="cinema_name", how='right')
-    if is_who == '0':
+    if owner == "台":
         # 台台
         df = pd.read_excel(f'{FilePath}/cinema_tai.xlsx')
-    elif is_who == '1':
+    elif owner == "兴吧":
         # 兴吧
         df = pd.read_excel(f'{FilePath}/cinema_park.xlsx')
-    elif is_who == '2':
+    elif owner == "散粉":
         # 散粉
         df = pd.read_excel(f'{FilePath}/cinema_other.xlsx')
     else:
-        logger.warning("is_who参数错误！！！")
+        logger.warning("owner参数错误！！！")
     # df.to_excel(f'{FilePath}/cinema_park.xlsx', index=False)
     data = df.to_json(orient="table")
     cinemas_list = json.loads(data)["data"]
@@ -72,15 +75,15 @@ def check_gold(date, begin_time, fill_rate_dict):
 
 # 没用到
 def deal_data(fill_rate_dict: dict, file_path: str):
-    df = pd.read_csv(f"{FilePath}/allin.csv")
+    df = pd.read_excel(f"/Users/laysuda/Desktop/allin/0729数据/台0811-0812.xlsx")
     # 判断是否是工作日、黄金场
     df[['is_weekday', 'is_gold', 'fill_rate']] = df.apply(
-        lambda x: pd.Series(check_gold(x['cinema_date'], x['begin_time'], fill_rate_dict)), axis=1)
+        lambda x: pd.Series(check_gold(x['日期'], x['放映时间'], fill_rate_dict)), axis=1)
     # 计算填场数量
-    df.eval('fill_seats = all_seats * fill_rate', inplace=True)
+    df.eval('fill_seats = 总座位数 * fill_rate', inplace=True)
     df['fill_seats'] = df['fill_seats'].astype(int)
     # 排序
-    df.sort_values(by=['city_name', 'cinema_name', 'begin_time'], inplace=True)
+    df.sort_values(by=['城市', '日期', '放映时间'], inplace=True)
     df.rename(columns={
         'movie': '电影名',
         'city_name': '城市',
@@ -106,5 +109,10 @@ def deal_data(fill_rate_dict: dict, file_path: str):
 
 if __name__ == '__main__':
     # DealData().deal_data(fill_rate_dict={"非黄金场":0.02, "黄金场":0.05}, file_path="/Users/laysuda/Desktop/allin/八角笼中0728.xlsx")
-    get_cinemas_info(is_who=0)
+    # 填场比例说明
+    fill_rate_dict = {"非黄金场": 0.02, "黄金场": 0.05}
+
+    # 数据导出本地路径
+    file_to_path = "/Users/laysuda/Desktop/台0811-0812.xlsx"
+    deal_data(fill_rate_dict, file_to_path)
     # pass
