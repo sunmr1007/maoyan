@@ -1,7 +1,10 @@
+import os
+import sys
 from os.path import dirname
 
 import pandas as pd
 
+sys.path.append(os.path.abspath('../../'))
 import maoyanProject.files
 
 FilePath = dirname(maoyanProject.files.__file__)
@@ -16,7 +19,7 @@ def output_excel(file_path):
         pass
     df.drop_duplicates(keep='first', inplace=True)
     # 排序
-    df.sort_values(by=['city_name', 'cinema_name', 'begin_time'], inplace=True)
+    df.sort_values(by=['city_name', 'cinema_url', 'cinema_date', 'begin_time'], inplace=True)
     df.rename(columns={
         'movie': '电影名',
         'owner': '负责人',
@@ -39,6 +42,7 @@ def output_excel(file_path):
         'fill_seats': '需填场数量',
     }, inplace=True)
     owner_list = df['负责人'].tolist()
+    owner_list = list(set(owner_list))
     for i in owner_list:
         df_to = df[df['负责人'] == i]
         df_to.to_excel(f'{file_path}/{i}.xlsx', index=False)
@@ -46,5 +50,5 @@ def output_excel(file_path):
 
 if __name__ == '__main__':
     # 导出到本地的文件夹路径
-    file_path = "/Users/laysuda/Desktop/allin/0729/"
+    file_path = "/Users/laysuda/Desktop/allin/0730/"
     output_excel(file_path)

@@ -19,6 +19,7 @@ def get_cinemas_info(owner="台"):
     :return:
     """
     # cinema_all_df = pd.read_excel(f'{FilePath}/cinemas_all.xlsx')
+    # cinema_df = pd.read_excel(f'{FilePath}/other.xlsx')
     # df = pd.merge(cinema_all_df, cinema_df, on="cinema_name", how='right')
     if owner == "台":
         # 台台
@@ -26,12 +27,15 @@ def get_cinemas_info(owner="台"):
     elif owner == "兴吧":
         # 兴吧
         df = pd.read_excel(f'{FilePath}/cinema_park.xlsx')
+    elif owner == "铁羊":
+        # 铁羊
+        df = pd.read_excel(f'{FilePath}/cinema_tieyang.xlsx')
     elif owner == "散粉":
         # 散粉
         df = pd.read_excel(f'{FilePath}/cinema_other.xlsx')
     else:
         logger.warning("owner参数错误！！！")
-    # df.to_excel(f'{FilePath}/cinema_park.xlsx', index=False)
+    # df.to_excel(f'{FilePath}/cinema_tieyang.xlsx', index=False)
     data = df.to_json(orient="table")
     cinemas_list = json.loads(data)["data"]
     for cinema in cinemas_list:
@@ -110,9 +114,10 @@ def deal_data(fill_rate_dict: dict, file_path: str):
 if __name__ == '__main__':
     # DealData().deal_data(fill_rate_dict={"非黄金场":0.02, "黄金场":0.05}, file_path="/Users/laysuda/Desktop/allin/八角笼中0728.xlsx")
     # 填场比例说明
-    fill_rate_dict = {"非黄金场": 0.02, "黄金场": 0.05}
-
-    # 数据导出本地路径
-    file_to_path = "/Users/laysuda/Desktop/台0811-0812.xlsx"
-    deal_data(fill_rate_dict, file_to_path)
+    # fill_rate_dict = {"非黄金场": 0.02, "黄金场": 0.05}
+    #
+    # # 数据导出本地路径
+    # file_to_path = "/Users/laysuda/Desktop/台0811-0812.xlsx"
+    # deal_data(fill_rate_dict, file_to_path)
     # pass
+    get_cinemas_info(owner="台")

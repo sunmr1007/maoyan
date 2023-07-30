@@ -1,7 +1,9 @@
 import json
+import os
+import sys
 
 import scrapy
-
+sys.path.append(os.path.abspath('../../'))
 from maoyanProject.items import ALLItem
 from maoyanProject.utils.DealData import get_cinemas_info
 
@@ -15,7 +17,7 @@ class Spider(scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.movie_date_list = ['2023-08-11', '2023-08-12']  # 日期（要填）
+        self.movie_date_list = ['2023-08-11', '2023-08-13']  # 日期（要填）
         # self.movieId = '1413252'  # 电影id（八角笼中）
         self.movieId = '1374349'  # 电影id（孤注一掷）
         self.movie = '孤注一掷'  # 电影名（孤注一掷）
@@ -31,11 +33,15 @@ class Spider(scrapy.Spider):
             # 带账号信息
             "token": "",
         }
-        # 要爬 台的万达(owner=0)，兴吧(owner=1)，散粉(owner=2)
+
+        # 要爬的
         self.owner = "台"
         # self.owner = "兴吧"
+        # self.owner = "铁羊"
         # self.owner = "散粉"
         self.cinemas_list = get_cinemas_info(self.owner)
+        # self.cinemas_list = get_cinemas_info(self.owner)[199:300]
+        # self.cinemas_list = get_cinemas_info(self.owner)[300:]
 
     def start_requests(self):
         for cinema in self.cinemas_list:
