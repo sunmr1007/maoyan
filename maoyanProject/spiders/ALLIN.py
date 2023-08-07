@@ -3,6 +3,8 @@ import os
 import sys
 
 import scrapy
+from loguru import logger
+
 sys.path.append(os.path.abspath('../../'))
 from maoyanProject.items import ALLItem
 from maoyanProject.utils.DealData import get_cinemas_info
@@ -40,8 +42,10 @@ class Spider(scrapy.Spider):
         # self.owner = "铁羊"
         # self.owner = "散粉"
         self.cinemas_list = get_cinemas_info(self.owner)
+        self.cinemas_list = get_cinemas_info(self.owner)[:100]
+        # self.cinemas_list = get_cinemas_info(self.owner)[99:200]
         # self.cinemas_list = get_cinemas_info(self.owner)[199:300]
-        # self.cinemas_list = get_cinemas_info(self.owner)[300:]
+        # self.cinemas_list = get_cinemas_info(self.owner)[299:]
 
     def start_requests(self):
         for cinema in self.cinemas_list:
@@ -57,6 +61,9 @@ class Spider(scrapy.Spider):
             # return
 
     def parse(self, response, **kwargs):
+        if "猫眼验证中心" in response.text:
+            logger.warning("！！！出现滑块验证！！！")
+            return
         cinema_item = response.meta["cinema_item"]
         # print(response.text)
         for date in self.movie_date_list:
@@ -91,6 +98,9 @@ class Spider(scrapy.Spider):
                 # continue
 
     def detail_parse(self, response):
+        if "猫眼验证中心" in response.text:
+            logger.warning("！！！出现滑块验证！！！")
+            return
         item = response.meta["item"]
         selectable_seat = response.xpath('//span[contains(@class,"seat")][contains(@class,"selectable")]')
         sold_seat = response.xpath('//span[contains(@class,"seat")][contains(@class,"sold")]')
